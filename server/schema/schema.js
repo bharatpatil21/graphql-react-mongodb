@@ -9,60 +9,8 @@ const {
   GraphQLList
 } = graphql;
 
-//dummy data
-var books = [
-  {
-    id: '1',
-    name: "this is book 1",
-    gener: "look",
-    authorId: '1'
-  },
-  {
-    id: '2',
-    name: "this is book 2",
-    gener: "look",
-    authorId: '2'
-  },
-  {
-    id: '3',
-    name: "this is book 3",
-    gener: "look",
-    authorId: '1'
-  },
-  {
-    id: '4',
-    name: "this is book 3",
-    gener: "look",
-    authorId: '2'
-  },
-  {
-    id: '5',
-    name: "this is book 3",
-    gener: "look",
-    authorId: '3'
-  },
-  {
-    id: '6',
-    name: "this is book 3",
-    gener: "look",
-    authorId: '3'
-  }
-]
-
-var authors = [
-  {
-    name: 'bharat p', age: 26, id: '1'
-  },
-  {
-    name: 'Sagar p', age: 29, id: '2'
-  },
-  {
-    name: 'Abhi p', age: 21, id: '3'
-  },
-  {
-    name: 'vishal p', age: 26, id: '4'
-  }
-]
+const Book = require('../models/book');
+const Author = require('../models/author');
 
 const BookType = new GraphQLObjectType({
   name: "Book",
@@ -73,7 +21,7 @@ const BookType = new GraphQLObjectType({
     author: {
       type: AuthorType,
       resolve(parent, args) {
-        return _.find(authors, {id: parent.authorId})
+        // return _.find(authors, {id: parent.authorId})
       }
     }
   })
@@ -88,7 +36,7 @@ const AuthorType = new GraphQLObjectType({
     books: {
       type: new GraphQLList(BookType),
       resolve(parent, args) {
-        return _.filter(books, {authorId: parent.id})
+        // return _.filter(books, {authorId: parent.id})
       }
     }
   })
@@ -101,20 +49,20 @@ const RootQuery = new GraphQLObjectType({
       type: BookType,
       args: {id: { type: GraphQLID }},
       resolve(parent, args) {
-        return _.find(books, {id: args.id});
+        // return _.find(books, {id: args.id});
       }
     },
     author: {
       type: AuthorType,
       args: {id: { type: GraphQLID }},
       resolve(parent, args) {
-        return _.find(authors, {id: args.id});
+        // return _.find(authors, {id: args.id});
       }
     },
     books: {
       type: new GraphQLList(BookType),
       resolve(parent, args) {
-        return books;
+        // return books;
       }
     },
     authors: {
@@ -126,6 +74,27 @@ const RootQuery = new GraphQLObjectType({
   }
 });
 
+const Mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    addAuthor: {
+      type: AuthorType,
+      args: {
+        name: { type: GraphQLString },
+        age: { type: GraphQLInt }
+      },
+      resolve(parent, args) {
+        let author = new Author({
+          name: args.name,
+          age: args.age
+        });
+        return author.save();
+      }
+    }
+  }
+})
+
 module.exports = new GraphQLSchema({
-  query: RootQuery
+  query: RootQuery,
+  mutation: Mutation
 });
