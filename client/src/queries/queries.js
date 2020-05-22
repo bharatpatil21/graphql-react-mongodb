@@ -25,3 +25,20 @@ export const ADD_BOOK = gql`
         }
     }
 `;
+
+export const GET_BOOK = gql`
+  query($id:ID) {
+    book(id: $id) {
+      id,
+      name,
+      author {
+        id,
+        name,
+        books {
+          name,
+          id
+        }
+      }
+    }
+  }
+`;
